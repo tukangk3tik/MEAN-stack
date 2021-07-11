@@ -1,5 +1,11 @@
 export interface Post {
-  id?: string,
-  title: String;
-  content: String;
+  title: string;
+  content: string;
+  id: string;
+}
+
+export interface PostApi {
+  title: string;
+  content: string;
+  _id: string;
 }
