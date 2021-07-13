@@ -34,6 +34,12 @@ export class PostService {
     return this.postsUpdated.asObservable();
   }
 
+  getPostDetail(id: string) {
+    //work synchronously
+    return this.http.get<{ _id: string, title: string, content: string}>
+      ("http://localhost:3000/api/post/" + id);
+  }
+
   addPost(title: string, content: string) {
     const post: any = {title: title, content: content};
     this.http
@@ -45,6 +51,13 @@ export class PostService {
         this.posts.push(post);
         this.postsUpdated.next([...this.posts]);
       });
+  }
+
+  updatePost(id: string, title: string, content: string) {
+    const post: Post = { id:id, title:title, content:content };
+    this.http
+      .put("http://localhost:3000/api/post/" + id, post)
+      .subscribe(response => console.log(response));
   }
 
   deletePost(postId: string) {
