@@ -17,6 +17,7 @@ export class PostCreateComponent implements OnInit {
    * when page load, post will be empty, there will be error.
    * To avoid it error, use null safety (?) in template like post?.title
    */
+  isLoading = false;  //status for loading
   private mode = 'create';
   private postId?: string;
 
@@ -28,9 +29,15 @@ export class PostCreateComponent implements OnInit {
         this.mode = 'edit';
         this.postId = paramMap.get('postId')?.toString();
         if (this.postId !== undefined) {
+          //set loading true
+          this.isLoading = true;
+
           //work synchronously
           this.postsService.getPostDetail(this.postId)
             .subscribe(postData => {
+              //set loading false when receive data
+              this.isLoading = false;
+
               this.post = {id: postData._id, title: postData.title, content: postData.content}
             });
         }
@@ -45,6 +52,8 @@ export class PostCreateComponent implements OnInit {
     if (form.invalid) {
       return;
     }
+
+    this.isLoading = true;
 
     if (this.mode === 'create') {
       this.postsService.addPost(form.value.title, form.value.content);
