@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -15,6 +16,12 @@ mongoose.connect('mongodb+srv://yan:deogratias88@cluster0.qkexc.mongodb.net/node
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
+
+/**
+ * this to enable access to file, without it, you cant reach the file url
+ * use the /images path, and helped by path library by node to generate the path
+ * */
+app.use("/images", express.static(path.join("backend/images")));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
