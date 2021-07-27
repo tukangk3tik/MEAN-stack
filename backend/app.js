@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const postRoutes = require('./routes/posts');
+const userRoutes = require('./routes/user');
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use((req, res, next) => {
  * But for path using params, we keep the params at the routes
  */
 app.use("/api/post", postRoutes);
+app.use("/api/user", userRoutes);
 
 
 module.exports = app;
