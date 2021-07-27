@@ -32,14 +32,30 @@ const storage = multer.diskStorage({
 });
 
 router.get("", (req, res, next) => {
-  Post.find()
+  const pageSize = +req.query.pageSize; // (+) for convert to number
+  const currentPage = req.query.page;
+  const postQuery = Post.find();
+  let fetchedPost;
+
+  if (pageSize && currentPage) {
+    postQuery
+      .skip(pageSize * (currentPage - 1)) //pagging setting
+      .limit(pageSize);
+  }
+
+  postQuery
     .then(documents => {
-      console.log(documents);
+      fetchedPost = documents;
+      return Post.count();
+    })
+    .then(count => {
       res.status(200).json({
         message: 'Success fetch post data',
-        posts: documents
+        posts: fetchedPost,
+        maxPosts: count
       });
-    });
+
+  });
 
 });
 
@@ -56,7 +72,7 @@ router.get("/:id", (req, res, next) => {
 
 });
 
-router.post('', multer({storage: storage}).single('image' ),(req, res, next) => {
+router.post('', multer({storage: storage}).single('image'),(req, res, next) => {
   const url = req.protocol + "://" + req.get("host");
   const post = new Post({
     title: req.body.title,
@@ -78,17 +94,27 @@ router.post('', multer({storage: storage}).single('image' ),(req, res, next) => 
 });
 
 //keep using params
-router.put("/:id", (req, res, next) => {
+router.put("/:id", multer({storage: storage}).single('image'), (req, res, next) => {
+
+  let imagePath = req.body.imagePath;
+  if (req.file) {
+    const url = req.protocol + "://" + req.get("host");
+    imagePath = url + "/images/" + req.file.filename;
+  }
+
   const post = new Post({
     _id: req.params.id,
     title: req.body.title,
-    content: req.body.content
-  })
+    content: req.body.content,
+    imagePath: imagePath
+  });
+
+  console.log('Hasil post: ' + post);
 
   Post.updateOne({_id: req.params.id}, post)
     .then(result => {
       console.log(result);
-      res.status(200).json({ message: 'Update successful!'})
+      res.status(200).json({ message: 'Update successful!'});
     });
 });
 

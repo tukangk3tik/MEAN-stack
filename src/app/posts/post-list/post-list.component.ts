@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
+import { PageEvent } from "@angular/material/paginator";
 import { Subscription } from "rxjs";
 
 import { PostService } from "src/app/service/posts.service";
@@ -16,24 +17,38 @@ export class PostListComponent implements OnInit, OnDestroy {
   //   {title: "Third Post", content: "This is the third post's content"}
   // ];
   posts: Post[] = [];
-  private postsSub: Subscription;
   isLoading = false;
+  totalPosts = 10;
+  postPerPage = 2;
+  currentPage = 1;
+  pageSizeOptions = [1, 2, 5, 10];
+  private postsSub: Subscription;
 
   constructor(public postService: PostService) {}
 
   ngOnInit() {
     this.isLoading = true;
-
-    this.postService.getPost();
+    this.postService.getPost(this.postPerPage, this.currentPage);
     this.postsSub = this.postService.getPostUpdateListener()
-      .subscribe((posts: Post[]) => {
-        this.posts = posts;
+      .subscribe((postData: {posts: Post[], postCount: number}) => {
+        this.posts = postData.posts;
+        this.totalPosts = postData.postCount;
         this.isLoading = false;
       });
   }
 
+  onChangedPage(pageData: PageEvent) {
+    this.currentPage = pageData.pageIndex + 1;
+    this.postPerPage = pageData.pageSize;
+    this.postService.getPost(this.postPerPage, this.currentPage);
+  }
+
   onDelete(postId?: string) {
-    if (postId !== undefined) this.postService.deletePost(postId);
+    if (postId !== undefined) {
+      this.postService.deletePost(postId).subscribe(() => {
+       this.postService.getPost(this.postPerPage, this.currentPage);
+      });
+    }
   }
 
   ngOnDestroy() {
