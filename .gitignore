@@ -48,3 +48,5 @@ Thumbs.db
 backend/images/*
 backend/.idea
 .idea
+
+nodemon.json
