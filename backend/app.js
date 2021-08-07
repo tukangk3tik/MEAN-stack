@@ -7,7 +7,9 @@ const userRoutes = require('./routes/user');
 
 const app = express();
 
-mongoose.connect('mongodb+srv://yan:deogratias88@cluster0.qkexc.mongodb.net/node-angular?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb+srv://yan:' +
+  process.env.MONGO_ATLAS_PW
+  + '@cluster0.qkexc.mongodb.net/node-angular?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('Connected to database!');
   })
@@ -28,7 +30,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization" //set accept header
   );
   res.setHeader(
     "Access-Control-Allow-Methods",
